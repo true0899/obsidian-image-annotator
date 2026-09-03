@@ -1,0 +1,9 @@
+.vscode/
+.idea/
+node_modules/
+dist/
+outputs/
+work/
+*.map
+data.json
+.DS_Store

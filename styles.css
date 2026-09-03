@@ -1,0 +1,145 @@
+.vf-image-annotator-modal {
+  width: min(96vw, 1400px);
+  max-width: none;
+}
+
+.vf-image-annotator-modal .modal-content {
+  padding: 0;
+}
+
+.vf-ia-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: min(82vh, 900px);
+}
+
+.vf-ia-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.vf-ia-toolbar button.is-active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.vf-ia-tool-group,
+.vf-ia-settings-group,
+.vf-ia-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vf-ia-settings-group {
+  margin-left: 18px;
+  padding-left: 14px;
+  border-left: 1px solid var(--background-modifier-border);
+}
+
+.vf-ia-zoom-controls {
+  margin-right: 8px;
+}
+
+.vf-ia-zoom-label {
+  min-width: 42px;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  text-align: center;
+}
+
+.vf-ia-toolbar .vf-ia-icon-button {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vf-ia-toolbar .vf-ia-icon-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.vf-ia-toolbar .vf-ia-spacer {
+  flex: 1;
+}
+
+.vf-ia-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.vf-ia-toolbar input[type="color"] {
+  width: 30px;
+  height: 30px;
+  padding: 2px;
+}
+
+.vf-ia-toolbar input[type="number"] {
+  width: 58px;
+}
+
+.vf-ia-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+  background: var(--background-secondary);
+}
+
+.vf-ia-canvas-wrap {
+  position: relative;
+  line-height: 0;
+  box-shadow: 0 1px 5px rgb(0 0 0 / 20%);
+  transform: scale(var(--image-annotator-zoom, 1));
+  transform-origin: center center;
+}
+
+.vf-ia-canvas-wrap canvas {
+  display: block;
+  max-width: min(86vw, 1200px);
+  max-height: 68vh;
+  object-fit: contain;
+  background: white;
+}
+
+.vf-ia-hint {
+  min-width: 0;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.vf-ia-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 10px 8px;
+}
+
+.vf-ia-status {
+  flex: 0 1 50%;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vf-ia-danger {
+  color: var(--text-error);
+}
