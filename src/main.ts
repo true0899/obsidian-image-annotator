@@ -156,6 +156,10 @@ interface TextItem extends BaseItem {
 
 type Item = RectItem | ArrowItem | PenItem | TextItem;
 
+interface ImageConverterMenuOwner {
+  addAnnotateImageMenuItem: (...args: unknown[]) => unknown;
+}
+
 const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "webp", "gif", "bmp"]);
 
 function cloneItems(items: Item[]): Item[] {
@@ -700,6 +704,10 @@ class ImageAnnotatorModal extends Modal {
 }
 
 export default class ImageAnnotatorPlugin extends Plugin {
+  private imageConverterMenuOwner: ImageConverterMenuOwner | null = null;
+  private originalImageConverterMenuMethod: ((...args: unknown[]) => unknown) | null = null;
+  private patchedImageConverterMenuMethod: ((...args: unknown[]) => unknown) | null = null;
+
   async onload(): Promise<void> {
     this.registerEvent(
       this.app.workspace.on("file-menu", (menu, file) => {
@@ -729,6 +737,11 @@ export default class ImageAnnotatorPlugin extends Plugin {
       menu.showAtPosition({ x: event.clientX, y: event.clientY });
     });
 
+    this.ensureImageConverterMenuIntegration();
+    this.registerInterval(
+      window.setInterval(() => this.ensureImageConverterMenuIntegration(), 2000)
+    );
+
     this.addCommand({
       id: "annotate-active-image",
       name: t("annotateActiveImage"),
@@ -741,8 +754,99 @@ export default class ImageAnnotatorPlugin extends Plugin {
     });
   }
 
+  onunload(): void {
+    this.restoreImageConverterMenuIntegration();
+  }
+
   private openAnnotator(file: TFile, noteFile: TFile | null): void {
     new ImageAnnotatorModal(this.app, file, noteFile).open();
+  }
+
+  private ensureImageConverterMenuIntegration(): void {
+    const owner = this.findImageConverterMenuOwner();
+    if (!owner) {
+      this.restoreImageConverterMenuIntegration();
+      return;
+    }
+    if (
+      owner === this.imageConverterMenuOwner &&
+      owner.addAnnotateImageMenuItem === this.patchedImageConverterMenuMethod
+    ) {
+      return;
+    }
+
+    this.restoreImageConverterMenuIntegration();
+    const original = owner.addAnnotateImageMenuItem;
+    const patched = (...args: unknown[]): unknown => {
+      const result: unknown = original.apply(owner, args);
+      const [menu, image] = args;
+      if (menu instanceof Menu && this.isImageElement(image)) {
+        this.addAnnotatorMenuItem(menu, image);
+      }
+      return result;
+    };
+
+    owner.addAnnotateImageMenuItem = patched;
+    this.imageConverterMenuOwner = owner;
+    this.originalImageConverterMenuMethod = original;
+    this.patchedImageConverterMenuMethod = patched;
+  }
+
+  private restoreImageConverterMenuIntegration(): void {
+    if (
+      this.imageConverterMenuOwner &&
+      this.originalImageConverterMenuMethod &&
+      this.imageConverterMenuOwner.addAnnotateImageMenuItem === this.patchedImageConverterMenuMethod
+    ) {
+      this.imageConverterMenuOwner.addAnnotateImageMenuItem = this.originalImageConverterMenuMethod;
+    }
+    this.imageConverterMenuOwner = null;
+    this.originalImageConverterMenuMethod = null;
+    this.patchedImageConverterMenuMethod = null;
+  }
+
+  private findImageConverterMenuOwner(): ImageConverterMenuOwner | null {
+    const pluginManager = (this.app as unknown as {
+      plugins?: { getPlugin?: (id: string) => unknown };
+    }).plugins;
+    const imageConverter = pluginManager?.getPlugin?.("image-converter");
+    if (!imageConverter || (typeof imageConverter !== "object" && typeof imageConverter !== "function")) {
+      return null;
+    }
+
+    const queue: Array<{ value: object; depth: number }> = [
+      { value: imageConverter, depth: 0 }
+    ];
+    const seen = new Set<object>();
+    while (queue.length && seen.size < 200) {
+      const current = queue.shift();
+      if (!current || seen.has(current.value)) continue;
+      seen.add(current.value);
+      const candidate = current.value as Partial<ImageConverterMenuOwner>;
+      if (typeof candidate.addAnnotateImageMenuItem === "function") {
+        return candidate as ImageConverterMenuOwner;
+      }
+      if (current.depth >= 2) continue;
+
+      for (const [key, child] of Object.entries(current.value)) {
+        if (key === "app" || key === "manifest" || key === "settings") continue;
+        if (!child || (typeof child !== "object" && typeof child !== "function")) continue;
+        if (Array.isArray(child) || child instanceof HTMLElement) continue;
+        queue.push({ value: child as object, depth: current.depth + 1 });
+      }
+    }
+    return null;
+  }
+
+  private addAnnotatorMenuItem(menu: Menu, image: HTMLImageElement): void {
+    const file = this.resolveImageFile(image);
+    if (!file) return;
+    menu.addItem((item) => {
+      item
+        .setTitle(t("annotateImage"))
+        .setIcon("square-dashed")
+        .onClick(() => this.openAnnotator(file, this.app.workspace.getActiveFile()));
+    });
   }
 
   private isImageElement(value: unknown): value is HTMLImageElement {
