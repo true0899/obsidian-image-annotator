@@ -30,6 +30,11 @@ jobs:
           npm run build
           node -e "const m=require('./manifest.json'); if(m.version!==process.env.GITHUB_REF_NAME) throw new Error('Tag must match manifest version')"
 
+      - name: Browser regression tests
+        run: |
+          npx playwright install --with-deps chromium
+          npm test
+
       - name: Attest build provenance
         uses: actions/attest@v4
         with:

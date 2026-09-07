@@ -1,145 +1,41 @@
-.vf-image-annotator-modal {
-  width: min(96vw, 1400px);
-  max-width: none;
-}
-
-.vf-image-annotator-modal .modal-content {
-  padding: 0;
-}
-
-.vf-ia-shell {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-height: min(82vh, 900px);
-}
-
-.vf-ia-toolbar {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 8px;
-  border-bottom: 1px solid var(--background-modifier-border);
-}
-
-.vf-ia-toolbar button.is-active {
-  background: var(--interactive-accent);
-  color: var(--text-on-accent);
-}
-
-.vf-ia-tool-group,
-.vf-ia-settings-group,
-.vf-ia-zoom-controls {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.vf-ia-settings-group {
-  margin-left: 18px;
-  padding-left: 14px;
-  border-left: 1px solid var(--background-modifier-border);
-}
-
-.vf-ia-zoom-controls {
-  margin-right: 8px;
-}
-
-.vf-ia-zoom-label {
-  min-width: 42px;
-  color: var(--text-muted);
-  font-size: var(--font-ui-small);
-  text-align: center;
-}
-
-.vf-ia-toolbar .vf-ia-icon-button {
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.vf-ia-toolbar .vf-ia-icon-button svg {
-  width: 18px;
-  height: 18px;
-}
-
-.vf-ia-toolbar .vf-ia-spacer {
-  flex: 1;
-}
-
-.vf-ia-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: auto;
-}
-
-.vf-ia-toolbar input[type="color"] {
-  width: 30px;
-  height: 30px;
-  padding: 2px;
-}
-
-.vf-ia-toolbar input[type="number"] {
-  width: 58px;
-}
-
-.vf-ia-stage {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-  padding: 12px;
-  background: var(--background-secondary);
-}
-
-.vf-ia-canvas-wrap {
-  position: relative;
-  line-height: 0;
-  box-shadow: 0 1px 5px rgb(0 0 0 / 20%);
-  transform: scale(var(--image-annotator-zoom, 1));
-  transform-origin: center center;
-}
-
-.vf-ia-canvas-wrap canvas {
-  display: block;
-  max-width: min(86vw, 1200px);
-  max-height: 68vh;
-  object-fit: contain;
-  background: white;
-}
-
-.vf-ia-hint {
-  min-width: 0;
-  color: var(--text-muted);
-  font-size: var(--font-ui-small);
-}
-
-.vf-ia-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 0 10px 8px;
-}
-
-.vf-ia-status {
-  flex: 0 1 50%;
-  min-width: 0;
-  overflow: hidden;
-  color: var(--text-muted);
-  font-size: var(--font-ui-smaller);
-  text-align: right;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.vf-ia-danger {
-  color: var(--text-error);
+.vf-image-annotator-modal { width: min(96vw, 1500px); max-width: none; height: min(94vh, 1100px); display: flex; flex-direction: column; }
+.vf-image-annotator-modal .modal-title { font-size: var(--font-ui-medium); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 30px; }
+.vf-image-annotator-modal .modal-content { flex: 1; min-height: 0; padding: 0; overflow: hidden; }
+.vf-ia-shell { display: flex; flex-direction: column; height: 100%; min-height: 0; gap: 8px; }
+.vf-ia-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 6px 2px; flex: 0 0 auto; border-bottom: 1px solid var(--background-modifier-border); }
+.vf-ia-tool-group, .vf-ia-settings-group, .vf-ia-actions, .vf-ia-zoom-controls, .vf-ia-output { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.vf-ia-output { margin-left: auto; }
+.vf-ia-toolbar .vf-ia-icon-button { width: 32px; height: 32px; flex: 0 0 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; }
+.vf-ia-icon-button svg { width: 18px; height: 18px; }
+.vf-ia-toolbar button.is-active { background: var(--interactive-accent); color: var(--text-on-accent); }
+.vf-ia-toolbar button:disabled { opacity: 0.4; }
+.vf-ia-toolbar .vf-ia-swatch { width: 22px; height: 22px; min-width: 22px; min-height: 22px; padding: 0; background: var(--swatch); border: 1px solid var(--background-modifier-border); box-shadow: none; border-radius: 50%; }
+.vf-ia-swatch[aria-pressed="true"] { outline: 2px solid var(--text-normal); outline-offset: 2px; }
+.vf-ia-settings-group { gap: 6px; }
+.vf-ia-settings-group input[type="color"] { width: 27px; height: 27px; padding: 1px; }
+.vf-ia-field { display: inline-flex; align-items: center; gap: 4px; font-size: var(--font-ui-small); white-space: nowrap; }
+.vf-ia-field input[type="number"] { width: 54px; height: 30px; padding: 3px; }
+.vf-ia-zoom-label { display: inline-block; width: 43px; text-align: center; font-size: var(--font-ui-small); }
+.vf-ia-stage { flex: 1 1 auto; min-height: 80px; min-width: 0; overflow: auto; background: var(--background-secondary); overscroll-behavior: contain; touch-action: none; }
+.vf-ia-surface { display: flex; width: max-content; min-width: 100%; min-height: 100%; padding: 16px; box-sizing: border-box; }
+.vf-ia-canvas-wrap { width: var(--canvas-width, 1px); height: var(--canvas-height, 1px); flex: none; margin: auto; line-height: 0; box-shadow: 0 1px 5px rgb(0 0 0 / 20%); }
+.vf-ia-canvas-wrap canvas { display: block; width: 100%; height: 100%; max-width: none; max-height: none; }
+.vf-ia-crosshair { cursor: crosshair; }
+.vf-ia-stage.is-panning, .vf-ia-stage.is-panning canvas { cursor: grab; }
+.vf-ia-stage.is-panning:active, .vf-ia-stage.is-panning:active canvas { cursor: grabbing; }
+.vf-ia-footer { flex: 0 0 auto; padding: 0 3px 4px; }
+.vf-ia-status { font-size: var(--font-ui-smaller); color: var(--text-muted); overflow-wrap: anywhere; }
+.vf-ia-dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.vf-ia-dialog-actions button { white-space: normal; height: auto; min-height: 32px; }
+.vf-ia-text-input { display: block; width: 100%; min-height: 120px; resize: vertical; }
+input.vf-ia-text-input { min-height: 32px; }
+.vf-ia-reference-select { display: block; width: 100%; min-width: 0; }
+@media (max-width: 600px) {
+  .vf-image-annotator-modal { width: 100%; height: 100%; max-height: 100%; padding: 12px; }
+  .vf-ia-toolbar { gap: 7px; }
+  .vf-ia-settings-group { width: 100%; }
+  .vf-ia-field { font-size: 11px; }
+  .vf-ia-field input[type="number"] { width: 44px; }
+  .vf-ia-toolbar .vf-ia-swatch { width: 19px; height: 19px; min-width: 19px; min-height: 19px; }
+  .vf-ia-settings-group { gap: 5px; }
 }

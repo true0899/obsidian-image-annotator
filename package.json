@@ -1,6 +1,6 @@
 {
   "name": "obsidian-image-annotator",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "private": true,
   "description": "Annotate vault images and save flattened PNG derivatives.",
   "license": "MIT",
@@ -16,6 +16,7 @@
     "build": "tsc --noEmit && node esbuild.config.mjs production",
     "dev": "node esbuild.config.mjs development",
     "lint": "eslint .",
+    "test": "node tests/run.mjs",
     "version": "node version-bump.mjs && git add manifest.json versions.json"
   },
   "devDependencies": {
@@ -26,8 +27,14 @@
     "eslint-plugin-obsidianmd": "^0.4.0",
     "globals": "^17.6.0",
     "jiti": "^2.6.1",
+    "lucide": "^1.41.0",
     "obsidian": "latest",
+    "playwright": "^1.63.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.59.1"
+  },
+  "dependencies": {
+    "mdast-util-from-markdown": "^2.0.3",
+    "mdast-util-to-markdown": "^2.1.2"
   }
 }
