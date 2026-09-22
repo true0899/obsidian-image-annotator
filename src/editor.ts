@@ -246,11 +246,14 @@ export class ImageAnnotatorModal extends Modal {
     return { x: clamp((event.clientX - rect.left) / this.zoom, 0, this.canvas.width), y: clamp((event.clientY - rect.top) / this.zoom, 0, this.canvas.height) };
   }
 
-  /** Constrain an arrow to the dominant axis while Shift is held. */
+  /** Snap a Shift-drawn arrow to the nearest 45-degree increment. */
   private constrainArrowPoint(start: Point, end: Point): Point {
-    return Math.abs(end.x - start.x) >= Math.abs(end.y - start.y)
-      ? { x: end.x, y: start.y }
-      : { x: start.x, y: end.y };
+    const dx = end.x - start.x, dy = end.y - start.y;
+    const length = Math.hypot(dx, dy);
+    if (!length) return end;
+    const increment = Math.PI / 4;
+    const angle = Math.round(Math.atan2(dy, dx) / increment) * increment;
+    return { x: start.x + length * Math.cos(angle), y: start.y + length * Math.sin(angle) };
   }
 
   private pointerDown = (event: PointerEvent): void => {
