@@ -154,6 +154,7 @@ export class ImageAnnotatorModal extends Modal {
   private buildToolbar(): void {
     const tools: Array<[Tool, string, string]> = [
       ["select", "mouse-pointer-2", tr("选择", "Select")], ["rect", "square", tr("矩形", "Rectangle")],
+      ["line", "minus", tr("直线", "Line")],
       ["arrow", "arrow-up-right", tr("箭头", "Arrow")], ["pen", "pencil", tr("画笔", "Pen")],
       ["text", "type", tr("文字", "Text")], ["number", "list-ordered", tr("编号", "Number")],
       ["redact", "square-dashed-bottom-code", tr("实心遮挡", "Solid redaction")], ["highlight", "highlighter", tr("高亮", "Highlight")]
@@ -246,8 +247,8 @@ export class ImageAnnotatorModal extends Modal {
     return { x: clamp((event.clientX - rect.left) / this.zoom, 0, this.canvas.width), y: clamp((event.clientY - rect.top) / this.zoom, 0, this.canvas.height) };
   }
 
-  /** Snap a Shift-drawn arrow to the nearest 45-degree increment. */
-  private constrainArrowPoint(start: Point, end: Point): Point {
+  /** Snap a Shift-drawn line or arrow to the nearest 45-degree increment. */
+  private constrainLinePoint(start: Point, end: Point): Point {
     const dx = end.x - start.x, dy = end.y - start.y;
     const length = Math.hypot(dx, dy);
     if (!length) return end;
@@ -303,8 +304,8 @@ export class ImageAnnotatorModal extends Modal {
       if (this.draft.type === "pen") {
         const previous = this.draft.points[this.draft.points.length - 1];
         if (Math.hypot(p.x - previous.x, p.y - previous.y) > 0.7 / this.zoom && this.draft.points.length < 100000) this.draft.points.push(p);
-      } else if (this.draft.type === "arrow" && event.shiftKey) {
-        this.draft.points[1] = this.constrainArrowPoint(this.draft.points[0], p);
+      } else if (["line", "arrow"].includes(this.draft.type) && event.shiftKey) {
+        this.draft.points[1] = this.constrainLinePoint(this.draft.points[0], p);
       } else this.draft.points[1] = p;
     } else if (drag.kind === "move") {
       this.items[this.selected] = moveItem(drag.before[this.selected], p.x - drag.start.x, p.y - drag.start.y);
@@ -327,7 +328,7 @@ export class ImageAnnotatorModal extends Modal {
     if (cancel) this.items = drag.before;
     else if (this.draft) {
       const first = this.draft.points[0], last = this.draft.points[this.draft.points.length - 1];
-      const valid = this.draft.type === "pen" ? this.draft.points.length > 1 : this.draft.type === "arrow" ? Math.hypot(last.x - first.x, last.y - first.y) > 2 : Math.abs(last.x - first.x) > 2 && Math.abs(last.y - first.y) > 2;
+      const valid = this.draft.type === "pen" ? this.draft.points.length > 1 : ["line", "arrow"].includes(this.draft.type) ? Math.hypot(last.x - first.x, last.y - first.y) > 2 : Math.abs(last.x - first.x) > 2 && Math.abs(last.y - first.y) > 2;
       if (valid) this.items.push(this.draft);
     }
     this.draft = null;

@@ -8,7 +8,7 @@ source file.
 
 ## Features
 
-- Draw rectangles, arrows, freehand marks, multiline text, numbered markers,
+- Draw rectangles, straight lines, arrows, freehand marks, multiline text, numbered markers,
   solid redactions, and translucent highlights.
 - Select, move, resize, recolor, and delete individual annotations. Double-click
   text or a numbered marker with the select tool to edit its content.
