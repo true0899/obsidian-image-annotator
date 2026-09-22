@@ -246,6 +246,13 @@ export class ImageAnnotatorModal extends Modal {
     return { x: clamp((event.clientX - rect.left) / this.zoom, 0, this.canvas.width), y: clamp((event.clientY - rect.top) / this.zoom, 0, this.canvas.height) };
   }
 
+  /** Constrain an arrow to the dominant axis while Shift is held. */
+  private constrainArrowPoint(start: Point, end: Point): Point {
+    return Math.abs(end.x - start.x) >= Math.abs(end.y - start.y)
+      ? { x: end.x, y: start.y }
+      : { x: start.x, y: end.y };
+  }
+
   private pointerDown = (event: PointerEvent): void => {
     if (!this.ready || this.busy || this.prompting || this.drag || event.button !== 0 && event.button !== 1) return;
     if (event.target !== this.canvas && !this.spaceDown && !this.panMode && event.button !== 1) return;
@@ -293,6 +300,8 @@ export class ImageAnnotatorModal extends Modal {
       if (this.draft.type === "pen") {
         const previous = this.draft.points[this.draft.points.length - 1];
         if (Math.hypot(p.x - previous.x, p.y - previous.y) > 0.7 / this.zoom && this.draft.points.length < 100000) this.draft.points.push(p);
+      } else if (this.draft.type === "arrow" && event.shiftKey) {
+        this.draft.points[1] = this.constrainArrowPoint(this.draft.points[0], p);
       } else this.draft.points[1] = p;
     } else if (drag.kind === "move") {
       this.items[this.selected] = moveItem(drag.before[this.selected], p.x - drag.start.x, p.y - drag.start.y);

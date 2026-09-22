@@ -226,6 +226,24 @@ try {
       if (viewport.width === 390) await page.screenshot({ path: `${qa}/mobile.png` });
     }
   });
+  await test("Shift constrains arrows to horizontal or vertical", async () => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.locator('[data-tool="arrow"]').click();
+    const box = await page.locator("canvas").boundingBox();
+    const pos = (x, y) => [box.x + x * box.width / 1200, box.y + y * box.height / 720];
+    await page.mouse.move(...pos(300, 300));
+    await page.keyboard.down("Shift");
+    await page.mouse.down(); await page.mouse.move(...pos(500, 390), { steps: 5 }); await page.mouse.up();
+    await page.keyboard.up("Shift");
+    await page.mouse.move(...pos(700, 300));
+    await page.keyboard.down("Shift");
+    await page.mouse.down(); await page.mouse.move(...pos(760, 500), { steps: 5 }); await page.mouse.up();
+    await page.keyboard.up("Shift");
+    const arrows = (await items()).filter(item => item.type === "arrow").slice(-2);
+    assert.equal(arrows.length, 2);
+    assert.ok(Math.abs(arrows[0].points[1].y - arrows[0].points[0].y) < 1, "first arrow should be horizontal");
+    assert.ok(Math.abs(arrows[1].points[1].x - arrows[1].points[0].x) < 1, "second arrow should be vertical");
+  });
   assert.deepEqual(errors, []);
   console.log(`PASS ${count} checks; screenshots: work/qa/desktop.png and work/qa/mobile.png`);
 } finally { await browser.close(); await new Promise(resolve => server.close(resolve)); }
