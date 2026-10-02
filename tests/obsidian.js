@@ -94,7 +94,7 @@ export function createApp() {
     on
   };
   app.fileManager = { trashFile: file => app.vault.trash(file) };
-  app.workspace = { getActiveFile: () => app.activeFile ?? null, on };
+  app.workspace = { getActiveFile: () => app.activeFile ?? null, getLeavesOfType: () => [], on };
   app.metadataCache = {
     fileToLinktext: file => file.path,
     getFirstLinkpathDest(link) {

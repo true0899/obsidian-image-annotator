@@ -8,6 +8,7 @@ export interface EditorHost {
   preferences: Preferences;
   remember(value: Preferences): void;
   savingPaths: Set<string>;
+  reloadMarkdown(note: TFile): Promise<void>;
 }
 
 export class ImageAnnotatorModal extends Modal {
@@ -476,6 +477,7 @@ export class ImageAnnotatorModal extends Modal {
         try { await replaceEmbeds(this.app, this.embedContext.note, target, refs); }
         catch (error) { console.error("Image Annotator: reference replacement failed", error); new Notice(tr("图片已保存，但引用未替换：笔记已变化或引用格式不支持。", "Image saved, but embeds were not replaced: the note changed or its syntax is unsupported.")); }
       }
+      if (this.embedContext) await this.host.reloadMarkdown(this.embedContext.note);
       new Notice(`${tr("已保存", "Saved")}: ${target.path}`);
       this.closed = true; super.close();
     } catch (error) {

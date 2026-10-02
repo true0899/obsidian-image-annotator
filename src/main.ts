@@ -1,4 +1,5 @@
 import { Menu, Notice, Plugin, TFile, normalizePath } from "obsidian";
+import type { View } from "obsidian";
 import { ImageAnnotatorModal } from "./editor";
 import { EmbedContext } from "./embeds";
 import { defaults, preferences, Preferences } from "./model";
@@ -8,6 +9,9 @@ import { tr } from "./ui";
 interface ImageConverterMenuOwner { addAnnotateImageMenuItem: (...args: unknown[]) => unknown }
 const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "webp", "gif", "bmp"]);
 function isImageFile(file: TFile): boolean { return IMAGE_EXTENSIONS.has(file.extension.toLowerCase()); }
+function isMarkdownFileView(view: View): view is View & { file: TFile | null } {
+  return view.getViewType() === "markdown" && "file" in view && view.file instanceof TFile;
+}
 
 export default class ImageAnnotatorPlugin extends Plugin {
   preferences: Preferences = { ...defaults };
@@ -70,6 +74,13 @@ export default class ImageAnnotatorPlugin extends Plugin {
   }
 
   onunload(): void { this.restoreImageConverterMenuIntegration(); }
+
+  async reloadMarkdown(note: TFile): Promise<void> {
+    const leaves = this.app.workspace.getLeavesOfType("markdown");
+    await Promise.all(leaves
+      .filter(leaf => isMarkdownFileView(leaf.view) && leaf.view.file?.path === note.path)
+      .map(leaf => leaf.openFile(note)));
+  }
 
   private openAnnotator(file: TFile, image?: HTMLImageElement): ImageAnnotatorModal {
     const note = this.app.workspace.getActiveFile();
