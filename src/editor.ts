@@ -1,13 +1,14 @@
 import { App, Component, Modal, Notice, TFile, normalizePath } from "obsidian";
 import { bounds, clamp, clone, defaults, drawItem, hitTest, Item, moveItem, Point, Preferences, Tool } from "./model";
 import { hash, imageData, readDocument, SIDECAR, writeDocument } from "./storage";
-import { chooseEmbeds, EmbedContext, replaceEmbeds } from "./embeds";
+import { chooseEmbeds, EmbedContext, EmbedReference, replaceEmbeds } from "./embeds";
 import { confirmDiscard, iconButton, promptValue, tr } from "./ui";
 
 export interface EditorHost {
   preferences: Preferences;
   remember(value: Preferences): void;
   savingPaths: Set<string>;
+  refreshMarkdownImages(note: TFile, source: TFile, target: TFile, outputHash: string, refs: EmbedReference[]): void;
 }
 
 export class ImageAnnotatorModal extends Modal {
@@ -464,6 +465,7 @@ export class ImageAnnotatorModal extends Modal {
     try {
       if (this.file.path !== this.initialPath) throw new Error("Image moved while editing; reopen it before saving");
       const targetPath = this.outputPath();
+      const source = this.file;
       if (this.host.savingPaths.has(targetPath)) throw new Error("Another editor is saving this image");
       this.host.savingPaths.add(targetPath); lockedPath = targetPath;
       const refs = targetPath !== this.file.path ? await chooseEmbeds(this.app, this.embedContext, this.file) : [];
@@ -472,10 +474,14 @@ export class ImageAnnotatorModal extends Modal {
       const target = await writeDocument(this.app, targetPath, bytes, { version: 1, baseImage: this.baseImage, sourcePath: this.sourcePath, outputHash, items: clone(this.items) }, targetPath === this.file.path ? this.originalHash : null);
       this.savedState = JSON.stringify(this.items);
       this.file = target; this.initialPath = target.path; this.originalHash = outputHash;
+      let referencesReplaced = target.path === source.path;
       if (refs.length && this.embedContext) {
-        try { await replaceEmbeds(this.app, this.embedContext.note, target, refs); }
-        catch (error) { console.error("Image Annotator: reference replacement failed", error); new Notice(tr("图片已保存，但引用未替换：笔记已变化或引用格式不支持。", "Image saved, but embeds were not replaced: the note changed or its syntax is unsupported.")); }
+        try {
+          await replaceEmbeds(this.app, this.embedContext.note, target, refs);
+          referencesReplaced = true;
+        } catch (error) { console.error("Image Annotator: reference replacement failed", error); new Notice(tr("图片已保存，但引用未替换：笔记已变化或引用格式不支持。", "Image saved, but embeds were not replaced: the note changed or its syntax is unsupported.")); }
       }
+      if (this.embedContext && referencesReplaced) this.host.refreshMarkdownImages(this.embedContext.note, source, target, outputHash, refs);
       new Notice(`${tr("已保存", "Saved")}: ${target.path}`);
       this.closed = true; super.close();
     } catch (error) {

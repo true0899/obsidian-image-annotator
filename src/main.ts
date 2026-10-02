@@ -1,6 +1,7 @@
 import { Menu, Notice, Plugin, TFile, normalizePath } from "obsidian";
+import type { View } from "obsidian";
 import { ImageAnnotatorModal } from "./editor";
-import { EmbedContext } from "./embeds";
+import { EmbedContext, EmbedReference } from "./embeds";
 import { defaults, preferences, Preferences } from "./model";
 import { SIDECAR } from "./storage";
 import { tr } from "./ui";
@@ -8,6 +9,9 @@ import { tr } from "./ui";
 interface ImageConverterMenuOwner { addAnnotateImageMenuItem: (...args: unknown[]) => unknown }
 const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "webp", "gif", "bmp"]);
 function isImageFile(file: TFile): boolean { return IMAGE_EXTENSIONS.has(file.extension.toLowerCase()); }
+function isMarkdownFileView(view: View): view is View & { file: TFile | null } {
+  return view.getViewType() === "markdown" && "file" in view && view.file instanceof TFile;
+}
 
 export default class ImageAnnotatorPlugin extends Plugin {
   preferences: Preferences = { ...defaults };
@@ -84,6 +88,33 @@ export default class ImageAnnotatorPlugin extends Plugin {
     const modal = new ImageAnnotatorModal(this.app, file, context, this);
     modal.open();
     return modal;
+  }
+
+  refreshMarkdownImages(note: TFile, source: TFile, target: TFile, outputHash: string, refs: EmbedReference[]): void {
+    const resource = this.app.vault.getResourcePath(target);
+    const separator = resource.includes("?") ? "&" : "?";
+    const refreshedSource = `${resource}${separator}annotator=${outputHash}`;
+    const indexes = new Set(refs.map(ref => ref.index));
+    for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
+      if (!isMarkdownFileView(leaf.view) || leaf.view.file?.path !== note.path) continue;
+      const images = Array.from(leaf.view.containerEl.querySelectorAll<HTMLImageElement>("img"))
+        .filter(image => this.resolveImageFile(image)?.path === source.path);
+      for (const [index, image] of images.entries()) {
+        if (refs.length && !indexes.has(index)) continue;
+        this.refreshImageElement(image, source, target, refreshedSource);
+      }
+    }
+  }
+
+  private refreshImageElement(image: HTMLImageElement, source: TFile, target: TFile, resource: string): void {
+    const wrapper = image.closest(".image-wrapper, .image-embed, .internal-embed");
+    for (const element of [image, wrapper]) {
+      if (!element) continue;
+      for (const attribute of ["data-path", "data-src"]) {
+        if (element.getAttribute(attribute) === source.path) element.setAttribute(attribute, target.path);
+      }
+    }
+    image.src = resource;
   }
 
   private ensureImageConverterMenuIntegration(): void {
