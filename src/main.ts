@@ -49,7 +49,7 @@ export default class ImageAnnotatorPlugin extends Plugin {
       const destination = file.path + SIDECAR;
       if (this.app.vault.getAbstractFileByPath(destination)) { new Notice(tr("标注数据未移动：目标位置已有同名文件。", "Annotation data was not moved: destination already exists.")); return; }
       void this.app.vault.rename(sidecar, destination).catch(error => {
-        console.error("Image Annotator: could not move annotation data", error);
+        console.error("Image Annotator Plus: could not move annotation data", error);
         new Notice(tr("图片已移动，但标注数据移动失败。", "Image moved, but annotation data could not be moved."));
       });
     }));
@@ -68,7 +68,7 @@ export default class ImageAnnotatorPlugin extends Plugin {
     this.preferences = preferences(value);
     const snapshot = { ...this.preferences };
     this.preferenceWrite = this.preferenceWrite.then(() => this.saveData({ preferences: snapshot })).catch(error => {
-      console.error("Image Annotator: could not save preferences", error);
+      console.error("Image Annotator Plus: could not save preferences", error);
       new Notice(tr("常用样式保存失败", "Could not save style preferences"));
     });
   }
@@ -127,7 +127,7 @@ export default class ImageAnnotatorPlugin extends Plugin {
     const contexts = this.imageMenuContexts;
     const addItem = (menu: Menu, file: TFile, image: HTMLImageElement) => {
       try { this.addAnnotateItem(menu, file, image); }
-      catch (error) { console.error("Image Annotator: could not extend image menu", error); }
+      catch (error) { console.error("Image Annotator Plus: could not extend image menu", error); }
     };
     const activeContext = () => this.activeImageContext;
     // Preserve the dynamic Menu receiver when forwarding below.

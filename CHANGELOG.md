@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0
+
+- Rename the plugin to **Image Annotator Plus** and switch to the
+  `image-annotator-plus` plugin id, so the plugin can be listed in the Obsidian
+  Community directory.
+- Include every change from 1.1.0: the straight line tool, Shift-to-snap
+  drawing, the image context-menu fix, and post-save preview refreshes.
+- Install into `<vault>/.obsidian/plugins/image-annotator-plus/`. Do not install
+  it alongside the original Image Annotator: both plugins read and write the
+  same `.annotator.json` companion files.
+
 ## 1.1.0
 
 - Add a straight line tool, and snap lines and arrows to 45-degree increments

@@ -95,7 +95,7 @@ export class ImageAnnotatorModal extends Modal {
     this.refresh();
     void this.load().catch(error => {
       if (this.closed) return;
-      console.error("Image Annotator: load failed", error);
+      console.error("Image Annotator Plus: load failed", error);
       new Notice(tr("无法打开标注数据：图片或标注文件已变化或损坏。原文件保持不变。", "Could not open annotations: the image or annotation file changed or is invalid. Original files are unchanged."));
       this.closed = true;
       super.close();
@@ -444,7 +444,7 @@ export class ImageAnnotatorModal extends Modal {
     try {
       const writing = navigator.clipboard.write([new ClipboardItem({ "image/png": this.png() })]);
       void writing.then(() => new Notice(tr("图片已复制", "Image copied"))).catch(error => {
-        console.error("Image Annotator: clipboard failed", error); new Notice(tr("复制失败，请检查剪贴板权限", "Copy failed; check clipboard permissions"));
+        console.error("Image Annotator Plus: clipboard failed", error); new Notice(tr("复制失败，请检查剪贴板权限", "Copy failed; check clipboard permissions"));
       }).finally(() => { this.busy = false; this.refresh(); });
     } catch (error) { console.error(error); this.busy = false; this.refresh(); new Notice(tr("复制图片失败", "Could not copy image")); }
   }
@@ -479,13 +479,13 @@ export class ImageAnnotatorModal extends Modal {
         try {
           await replaceEmbeds(this.app, this.embedContext.note, target, refs);
           referencesReplaced = true;
-        } catch (error) { console.error("Image Annotator: reference replacement failed", error); new Notice(tr("图片已保存，但引用未替换：笔记已变化或引用格式不支持。", "Image saved, but embeds were not replaced: the note changed or its syntax is unsupported.")); }
+        } catch (error) { console.error("Image Annotator Plus: reference replacement failed", error); new Notice(tr("图片已保存，但引用未替换：笔记已变化或引用格式不支持。", "Image saved, but embeds were not replaced: the note changed or its syntax is unsupported.")); }
       }
       if (this.embedContext && referencesReplaced) this.host.refreshMarkdownImages(this.embedContext.note, source, target, outputHash, refs);
       new Notice(`${tr("已保存", "Saved")}: ${target.path}`);
       this.closed = true; super.close();
     } catch (error) {
-      console.error("Image Annotator: save failed", error);
+      console.error("Image Annotator Plus: save failed", error);
       new Notice(tr("保存失败。请检查文件是否被移动、修改或占用，然后重试。", "Save failed. Check whether files were moved, modified, or locked, then retry."));
     } finally { if (lockedPath) this.host.savingPaths.delete(lockedPath); this.busy = false; if (!this.closed) this.refresh(); }
   }
