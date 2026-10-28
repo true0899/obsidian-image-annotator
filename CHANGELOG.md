@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0
+
+- Add a straight line tool, and snap lines and arrows to 45-degree increments
+  while Shift is held.
+- Keep Obsidian's own image context-menu entries and append **Annotate image**
+  to them instead of replacing the menu, so Copy image, Rename, and Reveal in
+  Finder stay available when native menus are enabled.
+- Refresh the image previews of open notes after a successful save.
+- Drop the Image Converter-specific menu patch and its polling timer.
+
 ## 1.0.2
 
 - Edit individual annotations: selection, movement, resizing, deletion, styles,

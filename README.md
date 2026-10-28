@@ -10,6 +10,9 @@ source file.
 
 - Draw rectangles, straight lines, arrows, freehand marks, multiline text, numbered markers,
   solid redactions, and translucent highlights.
+- Hold Shift while drawing a line or arrow to snap it to 45-degree increments.
+- Add **Annotate image** to Obsidian's own image context menu, keeping existing
+  entries such as Copy image, Rename, and Reveal in Finder.
 - Select, move, resize, recolor, and delete individual annotations. Double-click
   text or a numbered marker with the select tool to edit its content.
 - Remember the last color, line width, and text size; pick from six color swatches.
